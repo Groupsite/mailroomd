@@ -1,0 +1,15 @@
+#! /usr/bin/env ruby
+
+require "rubygems"
+require "bundler/setup"
+require "eventmachine"
+
+require "mailroom/mail_spool_timer"
+
+timers = {}
+
+EventMachine::run do
+  ARGV.each do |mailspool|
+    Mailroom::MailSpoolTimer.new(mailspool)
+  end
+end

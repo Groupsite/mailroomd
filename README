@@ -1,1 +1,10 @@
 An EventMachine daemon for rotating and submitting mail spools to an application for processing.
+
+Events:
+  1. Timer tick -> acquire lock
+  2. Lock acquired -> move file
+  3. File moved -> transfer to s3
+  4. Transfered to s3 -> Post to API
+  5. Posted to API -> log
+
+
