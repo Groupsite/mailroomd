@@ -3,8 +3,13 @@ An EventMachine daemon for rotating and submitting mail spools to an application
 Events:
   1. Timer tick -> acquire lock
   2. Lock acquired -> move file
-  3. File moved -> transfer to s3
+  3. File moved -> transfer to s3, restart timer
   4. Transfered to s3 -> Post to API
   5. Posted to API -> log
+
+To Do:
+  - Make sure locking/moving is enough to safely move files
+    - Make sure file is not cut in mid-message
+    - Make sure postfix does not continue to write to the moved file
 
 
