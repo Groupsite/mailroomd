@@ -7,11 +7,12 @@ module Mailroom
     TEMP_DIRECTORY = "/tmp/mailroom"
     S3_INBOX = "/mailroom/mbox/incoming"
 
+    cattr_accessor :transfer_mutex
+    self.transfer_mutex = Mutex.new
     attr_reader :mail_spool, :snapshot_filename
 
     def self.host
       @host ||= `hostname`.split('.').first
-
     end
 
     def logger
@@ -68,24 +69,25 @@ module Mailroom
 
     def spool_moved
       reset!
-      logger.info "Transferring #{snapshot_filename} to S3"
+      logger.info "Snapshot taken: #{snapshot_filename}"
       EventMachine::defer(lambda { transfer_snapshot }, lambda { snapshot_transfered })
     end
 
     def transfer_snapshot
       log_errors do
-        logger.debug "Transfer thread started for #{snapshot_filename}"
-        io = open(snapshot_filename)
-        logger.debug "Snapshot file #{snapshot_filename} opened"
-        AWS::S3::S3Object.store(File.join(S3_INBOX, File.basename(snapshot_filename)), io)
+        logger.debug "Transfer thread start for #{snapshot_filename}"
+        self.class.transfer_mutex.synchronize do
+          logger.info "Transfering #{snapshot_filename} to S3"
+          io = open(snapshot_filename)
+          logger.debug "Snapshot file #{snapshot_filename} opened"
+          AWS::S3::S3Object.store(File.join(S3_INBOX, File.basename(snapshot_filename)), io)
+        end
       end
     end
 
     def snapshot_transfered
-      logger.info "Snapshot #{snapshot_filename} transfered to s3"
+      logger.info "Snapshot #{snapshot_filename} transfered to S3"
     end
-
-
 
     def log_errors
       begin
