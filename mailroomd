@@ -8,8 +8,18 @@ require "mailroom"
 
 timers = {}
 
+trap("QUIT") do
+  Mailroom::MailSpoolSnapshotter.halt!
+end
+
+trap("INT") do
+  EventMachine::stop_event_loop
+end
+
 EventMachine::run do
   ARGV.each do |mailspool|
     Mailroom::MailSpoolSnapshotter.new(mailspool)
   end
 end
+
+Mailroom.logger.info "Exiting."

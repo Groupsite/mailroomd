@@ -7,12 +7,22 @@ module Mailroom
     TEMP_DIRECTORY = "/tmp/mailroom"
     S3_INBOX = "/mailroom/mbox/incoming"
 
-    cattr_accessor :transfer_mutex
+    cattr_accessor :transfer_mutex, :active_count
     self.transfer_mutex = Mutex.new
+    self.active_count = 0
     attr_reader :mail_spool, :snapshot_filename
 
     def self.host
       @host ||= `hostname`.split('.').first
+    end
+
+    def self.halted?
+      !!@halted
+    end
+
+    def self.halt!
+      Mailroom.logger.info("Winding down...") unless halted?
+      @halted = true
     end
 
     def logger
@@ -21,11 +31,19 @@ module Mailroom
 
     def initialize(mail_spool)
       @mail_spool = mail_spool
+      self.class.active_count += 1
       super(INTERVAL) { timer_tick }
     end
 
     def reset!
-      self.class.new(mail_spool)
+      self.class.new(mail_spool) unless self.class.halted?
+    end
+
+    def deactivate!
+      self.class.active_count -= 1
+      if self.class.active_count < 1
+        EventMachine::stop_event_loop
+      end
     end
 
     def timer_tick
@@ -55,6 +73,7 @@ module Mailroom
         # No file to lock!
         logger.info("File does not exist: #{mail_spool}")
         reset!
+        deactivate!
       end
     end
 
@@ -87,6 +106,7 @@ module Mailroom
 
     def snapshot_transfered
       logger.info "Snapshot #{snapshot_filename} transfered to S3"
+      deactivate!
     end
 
     def log_errors
