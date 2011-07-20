@@ -1,9 +1,22 @@
+GIT
+  remote: git://github.com/Groupsite/aws-s3.git
+  revision: 9e36c2cec1d5c46fba70db5f3ddf39834e1c3314
+  specs:
+    aws-s3 (0.6.2)
+      builder
+      mime-types
+      xml-simple
+
 GEM
   specs:
+    builder (3.0.0)
     eventmachine (0.12.10)
+    mime-types (1.16)
+    xml-simple (1.0.14)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  aws-s3!
   eventmachine

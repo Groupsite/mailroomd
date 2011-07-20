@@ -11,5 +11,9 @@ To Do:
   - Make sure locking/moving is enough to safely move files
     - Make sure file is not cut in mid-message
     - Make sure postfix does not continue to write to the moved file
-
-
+  - Graceful exit on QUIT signal
+    - Stop new snapshots
+    - Allow started snapshots to transfer
+  - Handle errors
+    - Hoptoad?
+  - Set loglevel?
