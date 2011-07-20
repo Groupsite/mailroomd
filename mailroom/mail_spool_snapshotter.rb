@@ -92,6 +92,7 @@ module Mailroom
         yield
       rescue Exception => e
         logger.error "#{e}\n#{e.backtrace.join("\n")}"
+        raise
       end
     end
   end
