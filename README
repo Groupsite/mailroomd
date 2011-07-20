@@ -7,13 +7,15 @@ Events:
   4. Transfered to s3 -> Post to API
   5. Posted to API -> log
 
+Signals:
+  INT - Immediate stop
+  QUIT - Graceful exit.  Finish created snapshots and exit
+
 To Do:
   - Make sure locking/moving is enough to safely move files
     - Make sure file is not cut in mid-message
     - Make sure postfix does not continue to write to the moved file
-  - Graceful exit on QUIT signal
-    - Stop new snapshots
-    - Allow started snapshots to transfer
+  - Don't take new snapshots after QUIT (Will currently take one last snapshot)
   - Handle errors
     - Hoptoad?
   - Set loglevel?
