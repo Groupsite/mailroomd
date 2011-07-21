@@ -97,12 +97,31 @@ module Mailroom
         logger.info "Transfering #{snapshot_filename} to S3"
         io = open(snapshot_filename)
         logger.debug "Snapshot file #{snapshot_filename} opened"
-        AWS::S3::S3Object.store(File.join(S3_INBOX, File.basename(snapshot_filename)), io)
+        AWS::S3::S3Object.store(s3_key, io)
       end
     end
 
     def snapshot_transfered
       logger.info "Snapshot #{snapshot_filename} transfered to S3"
+      post_snapshot
+    end
+
+    def post_snapshot
+      # TODO:
+      #  - Use SSH
+      #  - Put host, request path, basic auth in config file
+      #  - Put params in right place ?content?
+      logger.info "Posting #{s3_key} to application"
+      http = EventMachine::Protocols::HttpClient.request(:host => "gs.dev",
+                                                         :request => "/mailroom/mailspools",
+                                                         :verb => "POST",
+                                                         :basic_auth => { :username => "mail1", :password => "mypassword" },
+                                                         :query_string => "bucket=groupsite-development-clevinger&key=#{s3_key}")
+      http.callback { snapshot_posted }
+    end
+
+    def snapshot_posted
+      logger.info "Snapshot complete: #{s3_key}"
       deactivate!
     end
 
@@ -113,6 +132,10 @@ module Mailroom
         logger.error "#{e}\n#{e.backtrace.join("\n")}"
         raise
       end
+    end
+
+    def s3_key
+      File.join(S3_INBOX, File.basename(snapshot_filename))
     end
   end
 end
