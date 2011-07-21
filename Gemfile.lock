@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/Groupsite/aws-s3.git
-  revision: 9e36c2cec1d5c46fba70db5f3ddf39834e1c3314
+  revision: 84e855f79cb34f23fdee953f8e7fe4b9f5a40ed9
   specs:
     aws-s3 (0.6.2)
       builder

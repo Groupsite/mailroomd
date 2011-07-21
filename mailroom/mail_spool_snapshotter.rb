@@ -7,8 +7,7 @@ module Mailroom
     TEMP_DIRECTORY = "/tmp/mailroom"
     S3_INBOX = "/mailroom/mbox/incoming"
 
-    cattr_accessor :transfer_mutex, :active_count
-    self.transfer_mutex = Mutex.new
+    cattr_accessor :active_count
     self.active_count = 0
     attr_reader :mail_spool, :snapshot_filename
 
@@ -95,12 +94,10 @@ module Mailroom
     def transfer_snapshot
       log_errors do
         logger.debug "Transfer thread start for #{snapshot_filename}"
-        self.class.transfer_mutex.synchronize do
-          logger.info "Transfering #{snapshot_filename} to S3"
-          io = open(snapshot_filename)
-          logger.debug "Snapshot file #{snapshot_filename} opened"
-          AWS::S3::S3Object.store(File.join(S3_INBOX, File.basename(snapshot_filename)), io)
-        end
+        logger.info "Transfering #{snapshot_filename} to S3"
+        io = open(snapshot_filename)
+        logger.debug "Snapshot file #{snapshot_filename} opened"
+        AWS::S3::S3Object.store(File.join(S3_INBOX, File.basename(snapshot_filename)), io)
       end
     end
 
