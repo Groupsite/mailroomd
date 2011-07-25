@@ -1,6 +1,5 @@
 api:
-  host: yourhost.com
-  path: /mailroom/mailspools
+  url: https://yourhost.com/mailroom/mailspools
   username: yourusername
   password: yourpassword
 s3:

@@ -1,4 +1,5 @@
 require "time"
+require "em-http-request"
 
 module Mailroom
   class MailSpoolSnapshotter < EventMachine::Timer
@@ -107,17 +108,14 @@ module Mailroom
     end
 
     def post_snapshot
-      # TODO:
-      #  - Use SSH
       logger.info "Posting #{s3_key} to application"
-      http = EventMachine::Protocols::HttpClient.request(:host => Mailroom.api_config["host"],
-                                                         :request => Mailroom.api_config["path"],
-                                                         :verb => "POST",
-                                                         :basic_auth => { :username => Mailroom.api_config["username"],
-                                                           :password => Mailroom.api_config["password"] },
-                                                         :content => "bucket=#{AWS::S3::S3Object.current_bucket}&key=#{s3_key}",
-                                                         :contenttype => "application/x-www-form-urlencoded")
-      http.callback { snapshot_posted }
+      request = EventMachine::HttpRequest.new(Mailroom.api_config["url"]).
+        post(:body => {:bucket => AWS::S3::S3Object.current_bucket,
+                       :key => s3_key},
+             :head => {
+               'authorization' => [Mailroom.api_config["username"], Mailroom.api_config["password"]]
+             })
+      request.callback { snapshot_posted }
     end
 
     def snapshot_posted
