@@ -112,11 +112,12 @@ module Mailroom
       #  - Put host, request path, basic auth in config file
       #  - Put params in right place ?content?
       logger.info "Posting #{s3_key} to application"
-      http = EventMachine::Protocols::HttpClient.request(:host => "gs.dev",
-                                                         :request => "/mailroom/mailspools",
+      http = EventMachine::Protocols::HttpClient.request(:host => Mailroom.api_config["host"],
+                                                         :request => Mailroom.api_config["path"],
                                                          :verb => "POST",
-                                                         :basic_auth => { :username => "mail1", :password => "mypassword" },
-                                                         :query_string => "bucket=groupsite-development-clevinger&key=#{s3_key}")
+                                                         :basic_auth => { :username => Mailroom.api_config["username"],
+                                                           :password => Mailroom.api_config["password"] },
+                                                         :query_string => "bucket=#{AWS::S3::S3Object.current_bucket}&key=#{s3_key}")
       http.callback { snapshot_posted }
     end
 

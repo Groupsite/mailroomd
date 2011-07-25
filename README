@@ -15,7 +15,8 @@ To Do:
   - Make sure locking/moving is enough to safely move files
     - Make sure file is not cut in mid-message
     - Make sure postfix does not continue to write to the moved file
+  - Handle errors. Hoptoad?
+  - Set loglevel
+  - Make log less chatty at INFO level
+  - Allow config location to passed as an argument
   - Don't take new snapshots after QUIT (Will currently take one last snapshot)
-  - Handle errors
-    - Hoptoad?
-  - Set loglevel?
