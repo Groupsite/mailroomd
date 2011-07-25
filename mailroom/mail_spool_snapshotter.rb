@@ -36,7 +36,10 @@ module Mailroom
     end
 
     def reset!
-      self.class.new(mail_spool) unless self.class.halted?
+      unless self.class.halted? || @has_reset
+        self.class.new(mail_spool)
+        @has_reset = true
+      end
     end
 
     def deactivate!
@@ -116,6 +119,10 @@ module Mailroom
                'authorization' => [Mailroom.api_config["username"], Mailroom.api_config["password"]]
              })
       request.callback { snapshot_posted }
+      request.errback {
+        logger.error "Received an error from the application:\n" + request.error
+        deactivate!
+      }
     end
 
     def snapshot_posted
@@ -129,6 +136,8 @@ module Mailroom
       rescue Exception => e
         logger.error "#{e}\n#{e.backtrace.join("\n")}"
         HoptoadNotifier.notify(e)
+        reset!
+        deactivate!
         raise
       end
     end
