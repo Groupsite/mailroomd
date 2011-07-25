@@ -1,5 +1,11 @@
 An EventMachine daemon for rotating and submitting mail spools to an application for processing.
 
+Calling:
+  bundle exec ./mailroomd /path/to/your/mailspool [/paths/to/your/other/mailspools ...]
+
+  To set log level, set LOG_LEVEL environment variable like so:
+  LOG_LEVEL=DEBUG bundle exec ./mailroomd ...
+
 Events:
   1. Timer tick -> acquire lock
   2. Lock acquired -> move file
@@ -16,7 +22,5 @@ To Do:
     - Make sure file is not cut in mid-message
     - Make sure postfix does not continue to write to the moved file
   - Handle errors. Hoptoad?
-  - Set loglevel
-  - Make log less chatty at INFO level
   - Allow config location to passed as an argument
   - Don't take new snapshots after QUIT (Will currently take one last snapshot)

@@ -47,7 +47,7 @@ module Mailroom
     end
 
     def timer_tick
-      logger.info "Acquiring lock on #{mail_spool}"
+      logger.debug "Acquiring lock on #{mail_spool}"
       EventMachine::defer(lambda { acquire_lock }, lambda { |file| lock_acquired(file) })
     end
 
@@ -67,11 +67,11 @@ module Mailroom
         name = File.basename(mail_spool)
         time = Time.now
         @snapshot_filename = File.join(TEMP_DIRECTORY, "#{time.strftime("%Y%m%d%H%M%S")}-#{self.class.host}-#{name}")
-        logger.info("Moving #{mail_spool} to #{snapshot_filename}")
+        logger.debug("Moving #{mail_spool} to #{snapshot_filename}")
         EventMachine::defer(lambda { move_spool(file) }, lambda { spool_moved })
       else
         # No file to lock!
-        logger.info("File does not exist: #{mail_spool}")
+        logger.warn("File does not exist: #{mail_spool}")
         reset!
         deactivate!
       end
@@ -95,7 +95,7 @@ module Mailroom
     def transfer_snapshot
       log_errors do
         logger.debug "Transfer thread start for #{snapshot_filename}"
-        logger.info "Transfering #{snapshot_filename} to S3"
+        logger.debug "Transfering #{snapshot_filename} to S3"
         io = open(snapshot_filename)
         logger.debug "Snapshot file #{snapshot_filename} opened"
         AWS::S3::S3Object.store(s3_key, io)
@@ -108,7 +108,7 @@ module Mailroom
     end
 
     def post_snapshot
-      logger.info "Posting #{s3_key} to application"
+      logger.debug "Posting #{s3_key} to application"
       request = EventMachine::HttpRequest.new(Mailroom.api_config["url"]).
         post(:body => {:bucket => AWS::S3::S3Object.current_bucket,
                        :key => s3_key},

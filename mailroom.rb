@@ -4,7 +4,19 @@ require "aws/s3"
 module Mailroom
   extend self
   def logger
-    @logger = Logger.new("log/mailroomd.log")
+    unless defined? @logger
+      @logger = Logger.new("log/mailroomd.log")
+      @logger.level = log_level
+    end
+    @logger
+  end
+
+  def log_level
+    if ENV["LOG_LEVEL"]
+      Logger.const_get(ENV["LOG_LEVEL"])
+    else
+      Logger::INFO
+    end
   end
 
   def root
