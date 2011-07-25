@@ -10,6 +10,7 @@ GIT
 GEM
   remote: http://rubygems.org/
   specs:
+    activesupport (2.3.5)
     addressable (2.2.6)
     builder (3.0.0)
     em-http-request (0.3.0)
@@ -18,6 +19,9 @@ GEM
       eventmachine (>= 0.12.9)
     escape_utils (0.2.3)
     eventmachine (0.12.10)
+    hoptoad_notifier (2.4.2)
+      activesupport
+      builder
     mime-types (1.16)
     xml-simple (1.0.14)
 
@@ -28,3 +32,4 @@ DEPENDENCIES
   aws-s3!
   em-http-request
   eventmachine
+  hoptoad_notifier

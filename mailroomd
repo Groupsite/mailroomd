@@ -16,10 +16,16 @@ trap("INT") do
   EventMachine::stop_event_loop
 end
 
-EventMachine::run do
-  ARGV.each do |mailspool|
-    Mailroom::MailSpoolSnapshotter.new(mailspool)
+begin
+  EventMachine::run do
+    ARGV.each do |mailspool|
+      Mailroom::MailSpoolSnapshotter.new(mailspool)
+    end
   end
-end
 
-Mailroom.logger.info "Exiting."
+  Mailroom.logger.info "Exiting."
+rescue Exception => e
+  Mailroom.logger.error "#{e}\n#{e.backtrace.join("\n")}"
+  HoptoadNotifier.notify(e)
+  raise
+end

@@ -1,5 +1,6 @@
 require 'logger'
 require "aws/s3"
+require 'hoptoad_notifier'
 
 module Mailroom
   extend self
@@ -41,6 +42,10 @@ module Mailroom
 end
 
 Mailroom.establish_connection!
+
+HoptoadNotifier.configure do |config|
+  config.api_key = Mailroom.config['airbrake_key']
+end
 
 Dir[File.expand_path("mailroom/*.rb", Mailroom.root)].each do |r|
   require r
