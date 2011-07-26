@@ -147,3 +147,5 @@ module Mailroom
     end
   end
 end
+
+`mkdir -p #{Mailroom::MailSpoolSnapshotter::TEMP_DIRECTORY}`
