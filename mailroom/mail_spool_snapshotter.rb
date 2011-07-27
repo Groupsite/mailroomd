@@ -74,7 +74,7 @@ module Mailroom
         time = Time.now
         @snapshot_filename = File.join(self.class.temp_directory, "#{time.strftime("%Y%m%d%H%M%S")}-#{self.class.host}-#{name}")
         logger.debug("Moving #{mail_spool} to #{snapshot_filename}")
-        EventMachine::defer(lambda { move_spool(file) }, lambda { spool_moved })
+        EventMachine::defer(lambda { move_spool(file) }, lambda { |r| spool_moved })
       else
         # No file to lock!
         logger.warn("File does not exist: #{mail_spool}")
@@ -95,7 +95,7 @@ module Mailroom
     def spool_moved
       reset!
       logger.info "Snapshot taken: #{snapshot_filename}"
-      EventMachine::defer(lambda { transfer_snapshot }, lambda { snapshot_transfered })
+      EventMachine::defer(lambda { transfer_snapshot }, lambda { |r| snapshot_transfered })
     end
 
     def transfer_snapshot
