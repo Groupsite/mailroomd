@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/Groupsite/aws-s3.git
-  revision: 84e855f79cb34f23fdee953f8e7fe4b9f5a40ed9
+  revision: a926042cfbae852e898773db679b57e69c44c1b6
   specs:
     aws-s3 (0.6.2)
       builder
@@ -23,7 +23,7 @@ GEM
       activesupport
       builder
     mime-types (1.16)
-    xml-simple (1.0.14)
+    xml-simple (1.1.0)
 
 PLATFORMS
   ruby
