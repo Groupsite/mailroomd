@@ -16,7 +16,7 @@ module Mailroom
     attr_reader :mail_spool, :snapshot_filename
 
     def self.host
-      @host ||= `hostname`.split('.').first
+      @host ||= `hostname`.split('.').first.strip
     end
 
     def self.halted?
