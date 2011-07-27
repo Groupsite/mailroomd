@@ -24,6 +24,6 @@ To Do:
   - Allow config location to passed as an argument
   - Don't take new snapshots after QUIT (Will currently take one last snapshot)
   - Environments?
-    - Make Hoptoad not send in development
+    - Make Hoptoad automatically not send in development
     - Change default log level?
-  - Make Hoptoad optional
+  - Make Hoptoad dependency optional

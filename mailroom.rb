@@ -39,12 +39,23 @@ module Mailroom
   def establish_connection!
     AWS::S3::Base.establish_connection!(s3config)
   end
+
+  def notify(e, severity = :error)
+    logger.send severity, "#{e}\n#{e.backtrace.join("\n")}"
+    HoptoadNotifier.notify(e) if airbrake_enabled?
+  end
+
+  def airbrake_enabled?
+    config['airbrake_key']
+  end
 end
 
 Mailroom.establish_connection!
 
-HoptoadNotifier.configure do |config|
-  config.api_key = Mailroom.config['airbrake_key']
+if Mailroom.airbrake_enabled?
+  HoptoadNotifier.configure do |config|
+    config.api_key = Mailroom.config['airbrake_key']
+  end
 end
 
 Dir[File.expand_path("mailroom/*.rb", Mailroom.root)].each do |r|

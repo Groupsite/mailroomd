@@ -27,7 +27,6 @@ begin
 
   Mailroom.logger.info "Exiting."
 rescue Exception => e
-  Mailroom.logger.fatal "#{e}\n#{e.backtrace.join("\n")}"
-  HoptoadNotifier.notify(e)
+  Mailroom.notify(e, :fatal)
   raise
 end

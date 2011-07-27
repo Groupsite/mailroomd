@@ -137,8 +137,7 @@ module Mailroom
       begin
         yield
       rescue Exception => e
-        logger.error "#{e}\n#{e.backtrace.join("\n")}"
-        HoptoadNotifier.notify(e)
+        Mailroom.notify(e)
         reset!
         deactivate!
         raise
