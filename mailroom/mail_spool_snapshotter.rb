@@ -5,7 +5,10 @@ module Mailroom
   class MailSpoolSnapshotter < EventMachine::Timer
     INTERVAL = 1
 
-    TEMP_DIRECTORY = "/tmp/mailroom"
+    def self.temp_directory
+      Mailroom.config["temp_directory"] || "/tmp/mailroom"
+    end
+
     S3_INBOX = "/mailroom/mbox/incoming"
 
     cattr_accessor :active_count
@@ -69,7 +72,7 @@ module Mailroom
       if file
         name = File.basename(mail_spool)
         time = Time.now
-        @snapshot_filename = File.join(TEMP_DIRECTORY, "#{time.strftime("%Y%m%d%H%M%S")}-#{self.class.host}-#{name}")
+        @snapshot_filename = File.join(self.class.temp_directory, "#{time.strftime("%Y%m%d%H%M%S")}-#{self.class.host}-#{name}")
         logger.debug("Moving #{mail_spool} to #{snapshot_filename}")
         EventMachine::defer(lambda { move_spool(file) }, lambda { spool_moved })
       else
@@ -148,4 +151,4 @@ module Mailroom
   end
 end
 
-`mkdir -p #{Mailroom::MailSpoolSnapshotter::TEMP_DIRECTORY}`
+`mkdir -p #{Mailroom::MailSpoolSnapshotter.temp_directory}`
