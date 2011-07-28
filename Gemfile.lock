@@ -13,6 +13,7 @@ GEM
     activesupport (2.3.5)
     addressable (2.2.6)
     builder (3.0.0)
+    daemons (1.1.4)
     em-http-request (0.3.0)
       addressable (>= 2.0.0)
       escape_utils
@@ -30,6 +31,7 @@ PLATFORMS
 
 DEPENDENCIES
   aws-s3!
+  daemons
   em-http-request
   eventmachine
   hoptoad_notifier

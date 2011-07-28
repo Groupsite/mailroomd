@@ -1,32 +1,6 @@
 #! /usr/bin/env ruby
-
-$: << File.dirname(__FILE__)
-
 require "rubygems"
 require "bundler/setup"
-require "eventmachine"
+require "daemons"
 
-require "mailroom"
-
-timers = {}
-
-trap("QUIT") do
-  Mailroom::MailSpoolSnapshotter.halt!
-end
-
-trap("INT") do
-  EventMachine::stop_event_loop
-end
-
-begin
-  EventMachine::run do
-    ARGV.each do |mailspool|
-      Mailroom::MailSpoolSnapshotter.new(mailspool)
-    end
-  end
-
-  Mailroom.logger.info "Exiting."
-rescue Exception => e
-  Mailroom.notify(e, :fatal)
-  raise
-end
+Daemons.run(File.join(File.dirname(__FILE__), 'mailroomd.rb'))

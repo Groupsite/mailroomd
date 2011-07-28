@@ -7,7 +7,7 @@ module Mailroom
 
   def logger
     unless defined? @logger
-      @logger = Logger.new("log/mailroomd.log")
+      @logger = Logger.new(File.join(root, "log", "mailroomd.log"))
       @logger.level = log_level
       @logger.formatter = proc do |severity, datetime, progname, msg|
         [datetime.strftime("%b %d %H:%M:%S"),
