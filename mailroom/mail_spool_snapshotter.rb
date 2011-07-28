@@ -32,15 +32,16 @@ module Mailroom
       Mailroom.logger
     end
 
-    def initialize(mail_spool)
+    def initialize(mail_spool, first_run = true)
       @mail_spool = mail_spool
       self.class.active_count += 1
+      @first_run = first_run
       super(INTERVAL) { timer_tick }
     end
 
     def reset!
       unless self.class.halted? || @has_reset
-        self.class.new(mail_spool)
+        self.class.new(mail_spool, false)
         @has_reset = true
       end
     end
@@ -77,7 +78,8 @@ module Mailroom
         EventMachine::defer(lambda { move_spool(file) }, lambda { |r| spool_moved })
       else
         # No file to lock!
-        logger.warn("File does not exist: #{mail_spool}")
+        severity = @first_run ? :warn : :debug
+        logger.send severity, "File does not exist: #{mail_spool}"
         reset!
         deactivate!
       end
