@@ -121,15 +121,23 @@ module Mailroom
              :head => {
                'authorization' => [Mailroom.api_config["username"], Mailroom.api_config["password"]]
              })
-      request.callback { snapshot_posted }
-      request.errback {
-        logger.error "Received an error from the application:\n" + request.error
-        deactivate!
-      }
+      request.callback do
+        if request.response_header.http_status =~ /2\d\d/
+          snapshot_posted
+        else
+          post_failed("Received a #{request.response_header.http_status} response")
+        end
+      end
+      request.errback { post_failed(http.error) }
     end
 
     def snapshot_posted
       logger.info "Snapshot complete: #{s3_key}"
+      deactivate!
+    end
+
+    def post_failed(reason)
+      logger.error "Could not post snapshot: #{reason}"
       deactivate!
     end
 
