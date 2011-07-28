@@ -15,10 +15,6 @@ module Mailroom
     self.active_count = 0
     attr_reader :mail_spool, :snapshot_filename
 
-    def self.host
-      @host ||= `hostname`.split('.').first.strip
-    end
-
     def self.halted?
       !!@halted
     end
@@ -73,7 +69,7 @@ module Mailroom
       if file
         name = File.basename(mail_spool)
         time = Time.now
-        @snapshot_filename = File.join(self.class.temp_directory, "#{time.strftime("%Y%m%d%H%M%S")}-#{self.class.host}-#{name}")
+        @snapshot_filename = File.join(self.class.temp_directory, "#{time.strftime("%Y%m%d%H%M%S")}-#{Mailroom.host}-#{name}")
         logger.debug("Moving #{mail_spool} to #{snapshot_filename}")
         EventMachine::defer(lambda { move_spool(file) }, lambda { |r| spool_moved })
       else

@@ -4,10 +4,18 @@ require 'hoptoad_notifier'
 
 module Mailroom
   extend self
+
   def logger
     unless defined? @logger
       @logger = Logger.new("log/mailroomd.log")
       @logger.level = log_level
+      @logger.formatter = proc do |severity, datetime, progname, msg|
+        [datetime.strftime("%b %d %H:%M:%S"),
+         Mailroom.host,
+         "#{$0}[#{$$}]:",
+         "<#{severity}>",
+         msg].join(" ") + "\n"
+      end
     end
     @logger
   end
@@ -47,6 +55,10 @@ module Mailroom
 
   def airbrake_enabled?
     config['airbrake_key']
+  end
+
+  def self.host
+    @host ||= `hostname`.split('.').first.strip
   end
 end
 
