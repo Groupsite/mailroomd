@@ -1,10 +1,21 @@
 An EventMachine daemon for rotating and submitting mail spools to an application for processing.
 
 Calling:
-  bundle exec ./mailroomd /path/to/your/mailspool [/paths/to/your/other/mailspools ...]
+  mailroomd start
 
   To set log level, set LOG_LEVEL environment variable like so:
-  LOG_LEVEL=DEBUG bundle exec ./mailroomd ...
+  LOG_LEVEL=DEBUG mailroomd start
+
+Configuring:
+  Configuration is loaded from config.yml in the project directory.
+  Possible configuration keys:
+     - mail_spools -- a list of the mail spools to process
+     - s3 -- a hash of details for the s3 connection
+     - api -- a hash of details for the api to which the snapshots will be posted
+       - url -- where to post the snapshot
+       - username -- basic auth username
+       - password -- basic auth password
+     - airbrake_key -- The API key for Airbrake/Hoptoad.  Leave out to not report errors
 
 Events:
   1. Timer tick -> acquire lock

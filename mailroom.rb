@@ -57,8 +57,12 @@ module Mailroom
     config['airbrake_key']
   end
 
-  def self.host
+  def host
     @host ||= `hostname`.split('.').first.strip
+  end
+
+  def mail_spools
+    config["mail_spools"] || []
   end
 end
 

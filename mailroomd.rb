@@ -4,8 +4,6 @@ require "eventmachine"
 
 require "mailroom"
 
-timers = {}
-
 trap("TERM") do
   Mailroom::MailSpoolSnapshotter.halt!
 end
@@ -14,12 +12,17 @@ trap("INT") do
   EventMachine::stop_event_loop
 end
 
-Mailroom.logger.info "Starting up"
+Mailroom.logger.info "Starting up..."
 
 begin
   EventMachine::run do
-    ARGV.each do |mailspool|
-      Mailroom::MailSpoolSnapshotter.new(mailspool)
+    if Mailroom.mail_spools.any?
+      Mailroom.mail_spools.each do |mail_spool|
+        Mailroom::MailSpoolSnapshotter.new(mail_spool)
+      end
+    else
+      Mailroom.logger.fatal "No mail spools configured."
+      EventMachine::stop_event_loop
     end
   end
 

@@ -126,7 +126,7 @@ module Mailroom
           post_failed("Received a #{request.response_header.http_status} response")
         end
       end
-      request.errback { post_failed(http.error) }
+      request.errback { post_failed(request.error) }
     end
 
     def snapshot_posted
