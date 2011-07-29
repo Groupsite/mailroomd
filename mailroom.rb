@@ -10,19 +10,22 @@ module Mailroom
       @logger = Logger.new(File.join(root, "log", "mailroomd.log"))
       @logger.level = log_level
       @logger.formatter = proc do |severity, datetime, progname, msg|
-        [datetime.strftime("%b %d %H:%M:%S"),
+        lines = msg.split("\n")
+        lines_format = lines.size > 1 ? "[%0#{lines.size.to_s.size}d/#{lines.size}]" : ""
+        format = [datetime.strftime("%b %d %H:%M:%S"),
          Mailroom.host,
-         "#{$0}[#{$$}]:",
-         "<#{severity}>",
-         msg].join(" ") + "\n"
+         "#{File.basename($0)}[#{$$}]:",
+         "<#{severity}#{lines_format}>"].join(" ")
+        i = 0
+        lines.map { |line| (format % i+=1) + " #{line}"}.join("\n") + "\n"
       end
     end
     @logger
   end
 
   def log_level
-    if ENV["LOG_LEVEL"]
-      Logger.const_get(ENV["LOG_LEVEL"])
+    if config["log_level"]
+      Logger.const_get(config["log_level"].upcase)
     else
       Logger::INFO
     end

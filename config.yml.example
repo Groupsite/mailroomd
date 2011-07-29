@@ -1,3 +1,6 @@
+mail_spools:
+  - /var/mail/yourmailspool
+  - /var/mail/yourothermailspool
 api:
   url: https://yourhost.com/mailroom/mailspools
   username: yourusername
@@ -7,3 +10,4 @@ s3:
   secret_access_key: your-secret-access-key
   server: your-bucket-name.s3.amazonaws.com
 airbrake_key: yourhoptoadkey
+
