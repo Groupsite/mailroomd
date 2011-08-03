@@ -1,8 +1,4 @@
-$: << File.dirname(__FILE__)
-
-require "eventmachine"
-
-require "mailroom"
+require File.expand_path("./init.rb", File.dirname(__FILE__))
 
 trap("TERM") do
   Mailroom::MailSpoolSnapshotter.halt!

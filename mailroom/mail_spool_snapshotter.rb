@@ -3,13 +3,10 @@ require "em-http-request"
 
 module Mailroom
   class MailSpoolSnapshotter < EventMachine::Timer
+    include Logging
+    include Config
+
     INTERVAL = 1
-
-    def self.temp_directory
-      Mailroom.config["temp_directory"] || "/tmp/mailroom"
-    end
-
-    S3_INBOX = "/mailroom/mbox/incoming"
 
     cattr_accessor :active_count
     self.active_count = 0
@@ -22,10 +19,6 @@ module Mailroom
     def self.halt!
       Mailroom.logger.info("Winding down...") unless halted?
       @halted = true
-    end
-
-    def logger
-      Mailroom.logger
     end
 
     def initialize(mail_spool, first_run = true)
@@ -69,7 +62,7 @@ module Mailroom
       if file
         name = File.basename(mail_spool)
         time = Time.now
-        @snapshot_filename = File.join(self.class.temp_directory, "#{time.strftime("%Y%m%d%H%M%S")}-#{Mailroom.host}-#{name}")
+        @snapshot_filename = File.join(temp_directory, "#{time.strftime("%Y%m%d%H%M%S")}-#{Mailroom.host}-#{name}")
         logger.debug("Moving #{mail_spool} to #{snapshot_filename}")
         EventMachine::defer(lambda { move_spool(file) }, lambda { |r| spool_moved })
       else
@@ -113,11 +106,11 @@ module Mailroom
 
     def post_snapshot
       logger.debug "Posting #{s3_key} to application"
-      request = EventMachine::HttpRequest.new(Mailroom.api_config["url"]).
+      request = EventMachine::HttpRequest.new(api_config["url"]).
         post(:body => {:bucket => AWS::S3::S3Object.current_bucket,
                        :key => s3_key},
              :head => {
-               'authorization' => [Mailroom.api_config["username"], Mailroom.api_config["password"]]
+               'authorization' => [api_config["username"], api_config["password"]]
              })
       request.callback do
         if request.response_header.http_status =~ /2\d\d/
@@ -151,9 +144,7 @@ module Mailroom
     end
 
     def s3_key
-      File.join(S3_INBOX, File.basename(snapshot_filename))
+      File.join(s3_inbox, File.basename(snapshot_filename))
     end
   end
 end
-
-`mkdir -p #{Mailroom::MailSpoolSnapshotter.temp_directory}`

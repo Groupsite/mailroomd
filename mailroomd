@@ -1,6 +1,7 @@
 #! /usr/bin/env ruby
-require "rubygems"
-require "bundler/setup"
+require File.expand_path("./init.rb", File.dirname(__FILE__))
 require "daemons"
 
-Daemons.run(File.join(File.dirname(__FILE__), 'mailroomd.rb'), :dir_mode => :system)
+Daemons.run(File.join(File.dirname(__FILE__), 'mailroomd.rb'),
+            :dir_mode => :normal,
+            :dir => Mailroom.pid_directory)
