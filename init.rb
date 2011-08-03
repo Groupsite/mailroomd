@@ -1,3 +1,5 @@
+ENV['BUNDLE_GEMFILE'] ||= File.expand_path("./Gemfile", File.dirname(__FILE__))
+
 $: << File.dirname(__FILE__)
 require "rubygems"
 require "bundler/setup"
