@@ -8,6 +8,9 @@ require "eventmachine"
 
 require "mailroom"
 
+require File.expand_path("mailroom/logging.rb", File.dirname(__FILE__))
+require File.expand_path("mailroom/config.rb", File.dirname(__FILE__))
+
 Dir[File.expand_path("mailroom/*.rb", File.dirname(__FILE__))].each do |r|
   require r
 end
